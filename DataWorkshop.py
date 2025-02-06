@@ -107,8 +107,8 @@ for i in range(0, num_columns, cols_per_row):
 if 'df' not in st.session_state:
     st.session_state.df = None  # 初始化 DataFrame 状态
 
-# 创建两列布局：将按钮放在同一行
-button_col1, button_col2 = st.columns([1, 1])  # 两个按钮平分宽度
+# 创建三列布局：将按钮、提示信息和下载按钮放在同一行
+button_col1, button_col2, button_col3 = st.columns([1, 1, 1])  # 三个元素平分宽度
 
 with button_col1:
     if st.button("生成假数据"):
@@ -166,9 +166,28 @@ with button_col1:
             st.session_state.df = pd.DataFrame(data)
             
             # 显示提示信息
-            st.success("假数据已生成！")
+            st.session_state.success_message = "假数据已生成！"
+
+# 自定义CSS样式，使提示信息只显示绿色文字
+st.markdown(
+    """
+    <style>
+    .success-message {
+        color: green;
+        font-weight: bold;
+        margin: 0;
+        padding: 0;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 with button_col2:
+    if st.session_state.get("success_message"):
+        st.markdown(f'<p class="success-message">{st.session_state.success_message}</p>', unsafe_allow_html=True)
+
+with button_col3:
     if st.session_state.df is not None:
         # 提供下载链接：导出为Excel
         from io import BytesIO
