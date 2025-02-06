@@ -107,8 +107,25 @@ for i in range(0, num_columns, cols_per_row):
 if 'df' not in st.session_state:
     st.session_state.df = None  # 初始化 DataFrame 状态
 
-# 创建三列布局：将按钮、提示信息和下载按钮放在同一行
-button_col1, button_col2, button_col3 = st.columns([1, 1, 1])  # 三个元素平分宽度
+# 创建两列布局：左侧放按钮，右侧放下载按钮
+button_col1, button_col2 = st.columns([1, 1])  # 两个元素平分宽度
+
+# 自定义CSS样式，使弹窗提示为绿色
+st.markdown(
+    """
+    <style>
+    .stToast {
+        background-color: #d4edda; /* 绿色背景 */
+        color: #155724;           /* 深绿色文字 */
+        border: 1px solid #c3e6cb; /* 边框颜色 */
+        border-radius: 0.25rem;   /* 圆角 */
+        padding: 0.75rem;         /* 内边距 */
+        margin-bottom: 1rem;      /* 外边距 */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 with button_col1:
     if st.button("生成假数据"):
@@ -165,29 +182,10 @@ with button_col1:
             # 转换为pandas DataFrame
             st.session_state.df = pd.DataFrame(data)
             
-            # 显示提示信息
-            st.session_state.success_message = "假数据已生成！"
-
-# 自定义CSS样式，使提示信息只显示绿色文字
-st.markdown(
-    """
-    <style>
-    .success-message {
-        color: green;
-        font-weight: bold;
-        margin: 0;
-        padding: 0;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+            # 显示提示信息（弹窗形式）
+            st.toast("数据已生成！", icon="🎉")  # 使用 st.toast 显示弹窗提示
 
 with button_col2:
-    if st.session_state.get("success_message"):
-        st.markdown(f'<p class="success-message">{st.session_state.success_message}</p>', unsafe_allow_html=True)
-
-with button_col3:
     if st.session_state.df is not None:
         # 提供下载链接：导出为Excel
         from io import BytesIO
