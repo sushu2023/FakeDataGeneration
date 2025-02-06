@@ -7,7 +7,7 @@ import random
 fake = Faker('zh_CN')  # 设置为中文
 
 # 页面标题
-st.title("动态假数据生成器")
+st.title("动态数据生成器")
 
 # 将“生成数据条数”和“生成列数”放在同一行
 col1, col2 = st.columns(2)
@@ -128,7 +128,7 @@ st.markdown(
 )
 
 with button_col1:
-    if st.button("生成假数据"):
+    if st.button("生成数据"):
         # 数据验证：检查是否有错误
         has_error = False
         for min_val, max_val in zip(min_vals, max_vals):
@@ -156,7 +156,7 @@ with button_col1:
                     elif col_type == "国家":
                         unique_data_cache[col_name] = [fake.country() for _ in range(unique_count)]
             
-            # 生成假数据
+            # 生成数据
             data = []
             for _ in range(num_rows):
                 row = {}
@@ -183,7 +183,7 @@ with button_col1:
             st.session_state.df = pd.DataFrame(data)
             
             # 显示提示信息（弹窗形式）
-            st.toast("数据已生成！", icon="🎉")  # 使用 st.toast 显示弹窗提示
+            st.toast("数据已生成", icon="🎉")  # 使用 st.toast 显示弹窗提示
 
 with button_col2:
     if st.session_state.df is not None:
@@ -191,7 +191,7 @@ with button_col2:
         from io import BytesIO
         excel_file = BytesIO()
         with pd.ExcelWriter(excel_file, engine='openpyxl') as writer:
-            st.session_state.df.to_excel(writer, index=False, sheet_name='Fake Data')
+            st.session_state.df.to_excel(writer, index=False, sheet_name='Generated Data')
         
         # 将文件的指针移动到文件开头
         excel_file.seek(0)
@@ -200,11 +200,11 @@ with button_col2:
         st.download_button(
             label="下载为Excel",
             data=excel_file,
-            file_name="fake_data.xlsx",
+            file_name="generated_data.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 
-# 显示生成的假数据表格
+# 显示生成的数据表格
 if st.session_state.df is not None:
     # 自定义CSS样式，使表格宽度占满屏幕
     st.markdown(
@@ -219,6 +219,6 @@ if st.session_state.df is not None:
         unsafe_allow_html=True,
     )
     
-    # 显示生成的假数据表格
-    st.write("生成的假数据：")
+    # 显示生成的数据表格
+    st.write("生成的数据：")
     st.dataframe(st.session_state.df, use_container_width=True)
