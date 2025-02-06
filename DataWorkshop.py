@@ -107,10 +107,10 @@ for i in range(0, num_columns, cols_per_row):
 if 'df' not in st.session_state:
     st.session_state.df = None  # 初始化 DataFrame 状态
 
-# 创建两列布局：左侧放按钮，右侧放表格
-button_col, table_col = st.columns([1, 3])  # 左侧按钮占1份宽度，右侧表格占3份宽度
+# 创建两列布局：将按钮放在同一行
+button_col1, button_col2 = st.columns([1, 1])  # 两个按钮平分宽度
 
-with button_col:
+with button_col1:
     if st.button("生成假数据"):
         # 数据验证：检查是否有错误
         has_error = False
@@ -168,7 +168,8 @@ with button_col:
             # 显示提示信息
             st.success("假数据已生成！")
 
-    if st.session_state.df is not None:  # 只有在生成假数据后才显示下载按钮
+with button_col2:
+    if st.session_state.df is not None:
         # 提供下载链接：导出为Excel
         from io import BytesIO
         excel_file = BytesIO()
@@ -186,21 +187,21 @@ with button_col:
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 
-with table_col:
-    if st.session_state.df is not None:
-        # 自定义CSS样式，使表格宽度占满屏幕
-        st.markdown(
-            """
-            <style>
-            .full-width-table {
-                width: 100% !important;
-                overflow-x: auto;
-            }
-            </style>
-            """,
-            unsafe_allow_html=True,
-        )
-        
-        # 显示生成的假数据表格
-        st.write("生成的假数据：")
-        st.dataframe(st.session_state.df, use_container_width=True)
+# 显示生成的假数据表格
+if st.session_state.df is not None:
+    # 自定义CSS样式，使表格宽度占满屏幕
+    st.markdown(
+        """
+        <style>
+        .full-width-table {
+            width: 100% !important;
+            overflow-x: auto;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+    
+    # 显示生成的假数据表格
+    st.write("生成的假数据：")
+    st.dataframe(st.session_state.df, use_container_width=True)
