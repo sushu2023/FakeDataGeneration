@@ -9,7 +9,6 @@ fake = Faker('zh_CN')  # 设置为中文
 # 页面标题
 st.title("动态假数据生成器")
 
-
 # 将“生成数据条数”和“生成列数”放在同一行
 col1, col2 = st.columns(2)
 with col1:
@@ -26,6 +25,7 @@ column_types = []
 min_vals = []  # 存储最小值
 max_vals = []  # 存储最大值
 custom_values = []  # 存储用户输入的自定义值
+unique_counts = []  # 存储每个列的独特数据数量
 
 # 数据类型的选项（按新顺序）
 data_type_options = ["列名", "自定义", "日期", "姓名", "公司", "城市", "国家", "整数", "小数"]
@@ -53,6 +53,7 @@ for i in range(0, num_columns, cols_per_row):
                 min_vals.append(min_val)
                 max_vals.append(max_val)
                 custom_values.append(None)  # 自定义值为空
+                unique_counts.append(None)  # 独特数据数量为空
             elif column_type == "小数":
                 min_val = st.number_input(f"最小值", value=0.0, step=0.01, format="%.2f", key=f"min_{idx}")
                 max_val = st.number_input(f"最大值", value=100.0, step=0.01, format="%.2f", key=f"max_{idx}")
@@ -61,6 +62,7 @@ for i in range(0, num_columns, cols_per_row):
                 min_vals.append(min_val)
                 max_vals.append(max_val)
                 custom_values.append(None)  # 自定义值为空
+                unique_counts.append(None)  # 独特数据数量为空
             elif column_type == "自定义":
                 custom_input = st.text_input(
                     f"请输入逗号或顿号分隔的值",
@@ -74,10 +76,25 @@ for i in range(0, num_columns, cols_per_row):
                 custom_values.append(custom_list)  # 存储用户输入的自定义值
                 min_vals.append(None)
                 max_vals.append(None)
+                unique_counts.append(None)  # 独特数据数量为空
+            elif column_type in ["姓名", "公司", "城市", "国家"]:
+                # 弹出滑动条，允许用户选择独特数据的数量
+                unique_count = st.slider(
+                    f"{column_type} 的独特数据数量",
+                    min_value=1,
+                    max_value=20,
+                    value=5,
+                    key=f"unique_{idx}"
+                )
+                unique_counts.append(unique_count)  # 存储独特数据数量
+                min_vals.append(None)
+                max_vals.append(None)
+                custom_values.append(None)  # 自定义值为空
             else:
                 min_vals.append(None)
                 max_vals.append(None)
                 custom_values.append(None)  # 自定义值为空
+                unique_counts.append(None)  # 独特数据数量为空
             
             columns.append(col_name)
             column_types.append(column_type)
@@ -109,6 +126,20 @@ with button_col:
         if has_error:
             st.error("数据验证失败，请检查最小值/最大值或自定义值是否正确！")
         else:
+            # 预先生成所有独特数据
+            unique_data_cache = {}
+            for col_name, col_type, unique_count in zip(columns, column_types, unique_counts):
+                if col_type in ["姓名", "公司", "城市", "国家"] and unique_count is not None:
+                    if col_type == "姓名":
+                        unique_data_cache[col_name] = [fake.name() for _ in range(unique_count)]
+                    elif col_type == "公司":
+                        unique_data_cache[col_name] = [fake.company() for _ in range(unique_count)]
+                    elif col_type == "城市":
+                        unique_data_cache[col_name] = [fake.city() for _ in range(unique_count)]
+                    elif col_type == "国家":
+                        unique_data_cache[col_name] = [fake.country() for _ in range(unique_count)]
+            
+            # 生成假数据
             data = []
             for _ in range(num_rows):
                 row = {}
@@ -123,14 +154,8 @@ with button_col:
                             row[col_name] = None  # 如果没有输入值，默认为 None
                     elif col_type == "日期":
                         row[col_name] = fake.date_this_year().strftime("%Y-%m-%d")  # 生成今年的随机日期
-                    elif col_type == "姓名":
-                        row[col_name] = fake.name()
-                    elif col_type == "公司":
-                        row[col_name] = fake.company()
-                    elif col_type == "城市":
-                        row[col_name] = fake.city()
-                    elif col_type == "国家":
-                        row[col_name] = fake.country()
+                    elif col_type in ["姓名", "公司", "城市", "国家"]:
+                        row[col_name] = random.choice(unique_data_cache[col_name])  # 从预生成的独特数据中随机抽取
                     elif col_type == "整数":
                         row[col_name] = fake.random_int(min=min_val, max=max_val)
                     elif col_type == "小数":
