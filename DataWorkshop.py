@@ -2,6 +2,9 @@ import streamlit as st
 import pandas as pd
 from faker import Faker
 import random
+import os
+import toml
+from pathlib import Path
 
 # 初始化Faker实例并设置中文
 fake = Faker('zh_CN')  # 设置为中文
@@ -107,25 +110,8 @@ for i in range(0, num_columns, cols_per_row):
 if 'df' not in st.session_state:
     st.session_state.df = None  # 初始化 DataFrame 状态
 
-# 创建两列布局：左侧放按钮，右侧放下载按钮
-button_col1, button_col2 = st.columns([1, 1])  # 两个元素平分宽度
-
-# 自定义CSS样式，使弹窗提示为绿色
-st.markdown(
-    """
-    <style>
-    .stToast {
-        background-color: #d4edda; /* 绿色背景 */
-        color: #155724;           /* 深绿色文字 */
-        border: 1px solid #c3e6cb; /* 边框颜色 */
-        border-radius: 0.25rem;   /* 圆角 */
-        padding: 0.75rem;         /* 内边距 */
-        margin-bottom: 1rem;      /* 外边距 */
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+# 创建三列布局：左侧放生成按钮，中间放下载按钮，右侧放导入MySQL按钮
+button_col1, button_col2, button_col3 = st.columns([1, 1, 1])  # 三个元素平分宽度
 
 with button_col1:
     if st.button("生成数据"):
@@ -203,6 +189,57 @@ with button_col2:
             file_name="generated_data.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
+
+with button_col3:
+    if st.session_state.df is not None:
+        if st.button("导入至MySQL"):
+            # 弹出 MySQL 配置输入框
+            with st.form("mysql_config_form"):
+                st.markdown("**MySQL 配置信息**")
+                host = st.text_input("主机名", "localhost")
+                port = st.number_input("端口", value=3306, step=1)
+                user = st.text_input("用户名", "root")
+                password = st.text_input("密码", type="password")
+                database = st.text_input("数据库名", "routine")
+                table_name = st.text_input("数据表名", "data")
+                
+                submitted = st.form_submit_button("确认并导入")
+                
+                if submitted:
+                    try:
+                        # 更新 secrets.toml 文件
+                        secrets_path = Path(st.secrets.__file__).parent / "secrets.toml"
+                        secrets_data = toml.load(secrets_path)
+                        secrets_data["connections"]["mysql"] = {
+                            "type": "sql",
+                            "dialect": "mysql",
+                            "username": user,
+                            "password": password,
+                            "host": host,
+                            "port": port,
+                            "database": database
+                        }
+                        with open(secrets_path, "w") as f:
+                            toml.dump(secrets_data, f)
+                        
+                        # 使用 st.connection 连接 MySQL
+                        conn = st.connection("mysql")
+                        
+                        # 检查表名是否重复
+                        existing_tables = conn.query("SHOW TABLES;", ttl=0)
+                        existing_tables = [row[0] for row in existing_tables.values]
+                        if table_name in existing_tables:
+                            suffix = 1
+                            while f"{table_name}{suffix}" in existing_tables:
+                                suffix += 1
+                            table_name = f"{table_name}{suffix}"
+                        
+                        # 写入数据到 MySQL
+                        conn.session.execute(f"CREATE TABLE IF NOT EXISTS {table_name} (LIKE {existing_tables[0]});")
+                        st.session_state.df.to_sql(table_name, con=conn.session.bind, index=False, if_exists="replace")
+                        st.success(f"数据已成功导入到表 `{table_name}` 中！")
+                    except Exception as e:
+                        st.error(f"导入失败：{e}")
 
 # 显示生成的数据表格
 if st.session_state.df is not None:
