@@ -15,11 +15,14 @@ st.title("动态数据生成器")
 st.markdown(
     """
     <style>
-        .stToast {
-            background-color: #d4edda; /* 绿色背景 */
-            color: #155724; /* 深绿色文字 */
-            border: 1px solid #c3e6cb; /* 边框颜色 */
-        }
+    .stToast {
+        background-color: #d4edda; /* 绿色背景 */
+        color: #155724;           /* 深绿色文字 */
+        border: 1px solid #c3e6cb; /* 边框颜色 */
+        border-radius: 0.25rem;   /* 圆角 */
+        padding: 0.75rem;         /* 内边距 */
+        margin-bottom: 1rem;      /* 外边距 */
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -88,7 +91,7 @@ def generate_column_config(tab_name, num_columns):
     # 每行显示最多5个列配置
     cols_per_row = 5
     for i in range(0, len(config_to_display), cols_per_row):
-        col_config = st.columns(cols_per_row)
+        col_config = st.columns(cols_per_row)  # 创建一行最多5列的布局
         for j in range(cols_per_row):
             idx = i + j
             if idx >= len(config_to_display):
@@ -191,8 +194,12 @@ def generate_column_config(tab_name, num_columns):
                     date_ranges.append((None, None))  # 日期范围为空
                 columns.append(col_name)
                 column_types.append(column_type)
-    return columns, column_types, min_vals, max_vals, custom_values, unique_counts, date_ranges
+        
+        # 在每行配置结束后插入分割线
+        if i + cols_per_row < len(config_to_display):  # 只有当还有下一行时才插入分割线
+            st.markdown("---")  # 插入分割线
 
+    return columns, column_types, min_vals, max_vals, custom_values, unique_counts, date_ranges
 
 # 数据生成函数
 def generate_data(columns, column_types, min_vals, max_vals, custom_values, unique_counts, date_ranges, num_rows):
@@ -207,7 +214,6 @@ def generate_data(columns, column_types, min_vals, max_vals, custom_values, uniq
                 unique_data_cache[col_name] = [fake.city() for _ in range(unique_count)]
             elif col_type == "国家":
                 unique_data_cache[col_name] = [fake.country() for _ in range(unique_count)]
-
     data = []
     for _ in range(num_rows):
         row = {}
@@ -241,7 +247,6 @@ def generate_data(columns, column_types, min_vals, max_vals, custom_values, uniq
         data.append(row)
     return pd.DataFrame(data)
 
-
 # 显示数据和下载按钮
 def display_and_download(df, tab_name):
     button_col1, button_col2 = st.columns([1, 1])
@@ -263,10 +268,9 @@ def display_and_download(df, tab_name):
     st.write("生成的数据：")
     st.dataframe(df, use_container_width=True)
 
-
 # 主逻辑
 for tab, tab_name in zip([tab_default, tab_auto, tab_bank, tab_retail, tab_pharma], 
-                         ["默认", "汽车", "银行", "零售", "医药"]):
+        ["默认", "汽车", "银行", "零售", "医药"]):
     with tab:
         st.markdown(f"## {tab_name} 数据生成器")
         col1, col2 = st.columns(2)
