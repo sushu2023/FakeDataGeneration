@@ -285,9 +285,9 @@ for tab, tab_name in zip([tab_default, tab_auto, tab_bank, tab_retail, tab_pharm
         st.markdown(f"## {tab_name} 数据生成器")
         col1, col2 = st.columns(2)
         with col1:
-            num_rows = st.number_input("选择生成的数据条数", min_value=100, max_value=5000, value=200, step=100, key=f"{tab_name}_num_rows")
+            num_rows = st.number_input("选择生成的数据条数 (500~5000)", min_value=500, max_value=5000, value=1000, step=100, key=f"{tab_name}_num_rows")
         with col2:
-            num_columns = st.number_input("选择生成的列数", min_value=1, max_value=20, value=5, step=1, key=f"{tab_name}_num_columns")
+            num_columns = st.number_input("选择生成的列数 (1~20)", min_value=1, max_value=20, value=5, step=1, key=f"{tab_name}_num_columns")
         st.markdown("---")
         (
             columns,
