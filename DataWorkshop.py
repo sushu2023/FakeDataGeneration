@@ -5,6 +5,13 @@ import random
 import uuid
 from datetime import datetime, timedelta
 
+# 设置页面布局
+st.set_page_config(
+    page_title="Data Workshop",
+    page_icon=":bar_chart:",
+    layout="wide"
+)
+
 # 初始化Faker实例并设置中文
 fake = Faker('zh_CN')  # 设置为中文
 
