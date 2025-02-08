@@ -29,9 +29,13 @@ st.markdown(
 )
 
 # 创建标签页
-tab_default, tab_auto, tab_bank, tab_retail, tab_pharma = st.tabs(
-    ["默认", "汽车", "银行", "零售", "医药"]
-)
+tabs = [
+    "默认", "汽车", "银行", "医药", "电商", "教育", "医疗健康", "物流与运输", 
+    "房地产", "旅游与酒店", "保险行业", "社交媒体", "游戏行业", "金融投资", 
+    "农业", "娱乐与影视"
+]
+tab_objects = st.tabs(tabs)  # 创建标签页对象
+
 
 # 定义每个标签的默认列配置
 default_columns = {
@@ -56,19 +60,149 @@ default_columns = {
         {"name": "余额", "type": "小数", "min": 0.0, "max": 100000.0},
         {"name": "开户日期", "type": "日期"},
     ],
-    "零售": [
-        {"name": "订单ID", "type": "UUID"},
-        {"name": "客户姓名", "type": "姓名", "unique_count": 5},
-        {"name": "商品名称", "type": "枚举", "custom_values": "苹果, 香蕉, 橙子"},
-        {"name": "购买数量", "type": "整数", "min": 1, "max": 10},
-        {"name": "购买日期", "type": "日期"},
-    ],
     "医药": [
         {"name": "药品ID", "type": "UUID"},
         {"name": "药品名称", "type": "枚举", "custom_values": "阿司匹林, 维生素C, 抗生素"},
         {"name": "生产厂家", "type": "公司", "unique_count": 5},
         {"name": "生产日期", "type": "日期"},
         {"name": "有效期", "type": "整数", "min": 1, "max": 36},
+    ],
+    "电商": [
+        {"name": "订单ID", "type": "UUID"},
+        {"name": "用户ID", "type": "UUID"},
+        {"name": "商品名称", "type": "枚举", "custom_values": "手机, 电脑, 服装"},
+        {"name": "商品类别", "type": "枚举", "custom_values": "电子产品, 家居用品, 食品"},
+        {"name": "购买数量", "type": "整数", "min": 1, "max": 10},
+        {"name": "单价", "type": "小数", "min": 50.0, "max": 1000.0},
+        {"name": "总金额", "type": "小数", "min": 50.0, "max": 10000.0},
+        {"name": "下单时间", "type": "日期"},
+        {"name": "支付状态", "type": "枚举", "custom_values": "已支付, 未支付"},
+        {"name": "物流状态", "type": "枚举", "custom_values": "已发货, 运输中, 已签收"},
+    ],
+    "教育": [
+        {"name": "学生ID", "type": "UUID"},
+        {"name": "姓名", "type": "姓名", "unique_count": 5},
+        {"name": "年龄", "type": "整数", "min": 5, "max": 25},
+        {"name": "性别", "type": "枚举", "custom_values": "男, 女"},
+        {"name": "班级", "type": "枚举", "custom_values": "一年级, 二年级, 三年级"},
+        {"name": "成绩", "type": "小数", "min": 0.0, "max": 100.0},
+        {"name": "入学日期", "type": "日期"},
+        {"name": "家庭住址", "type": "城市", "unique_count": 5},
+        {"name": "联系电话", "type": "列名", "unique_count": 5},
+    ],
+    "医疗健康": [
+        {"name": "患者ID", "type": "UUID"},
+        {"name": "姓名", "type": "姓名", "unique_count": 5},
+        {"name": "性别", "type": "枚举", "custom_values": "男, 女"},
+        {"name": "年龄", "type": "整数", "min": 1, "max": 100},
+        {"name": "病历号", "type": "UUID"},
+        {"name": "就诊日期", "type": "日期"},
+        {"name": "疾病类型", "type": "枚举", "custom_values": "感冒, 高血压, 糖尿病"},
+        {"name": "医生姓名", "type": "姓名", "unique_count": 5},
+        {"name": "诊断结果", "type": "枚举", "custom_values": "确诊, 疑似, 未确诊"},
+        {"name": "药品名称", "type": "枚举", "custom_values": "阿司匹林, 维生素C"},
+    ],
+    "物流与运输": [
+        {"name": "运单ID", "type": "UUID"},
+        {"name": "发货人姓名", "type": "姓名", "unique_count": 5},
+        {"name": "收货人姓名", "type": "姓名", "unique_count": 5},
+        {"name": "发货地址", "type": "城市", "unique_count": 5},
+        {"name": "收货地址", "type": "城市", "unique_count": 5},
+        {"name": "物品名称", "type": "枚举", "custom_values": "电子产品, 食品, 家具"},
+        {"name": "物品重量", "type": "小数", "min": 0.1, "max": 100.0},
+        {"name": "运输方式", "type": "枚举", "custom_values": "空运, 陆运, 海运"},
+        {"name": "发货日期", "type": "日期"},
+        {"name": "预计到达日期", "type": "日期"},
+        {"name": "物流状态", "type": "枚举", "custom_values": "已发货, 运输中, 已签收"},
+    ],
+    "房地产": [
+        {"name": "房产ID", "type": "UUID"},
+        {"name": "房产类型", "type": "枚举", "custom_values": "公寓, 别墅, 商铺"},
+        {"name": "地址", "type": "城市", "unique_count": 5},
+        {"name": "面积", "type": "小数", "min": 50.0, "max": 500.0},
+        {"name": "房间数量", "type": "整数", "min": 1, "max": 10},
+        {"name": "价格", "type": "小数", "min": 500000.0, "max": 10000000.0},
+        {"name": "是否出售", "type": "枚举", "custom_values": "是, 否"},
+        {"name": "上市日期", "type": "日期"},
+        {"name": "房主姓名", "type": "姓名", "unique_count": 5},
+        {"name": "联系电话", "type": "列名", "unique_count": 5},
+    ],
+    "旅游与酒店": [
+        {"name": "订单ID", "type": "UUID"},
+        {"name": "客户姓名", "type": "姓名", "unique_count": 5},
+        {"name": "出行日期", "type": "日期"},
+        {"name": "返回日期", "type": "日期"},
+        {"name": "目的地", "type": "城市", "unique_count": 5},
+        {"name": "酒店名称", "type": "枚举", "custom_values": "希尔顿, 万豪, 如家"},
+        {"name": "房型", "type": "枚举", "custom_values": "标准间, 豪华间, 套房"},
+        {"name": "价格", "type": "小数", "min": 500.0, "max": 5000.0},
+        {"name": "预订状态", "type": "枚举", "custom_values": "已确认, 待确认, 已取消"},
+    ],
+    "保险行业": [
+        {"name": "保单ID", "type": "UUID"},
+        {"name": "客户姓名", "type": "姓名", "unique_count": 5},
+        {"name": "年龄", "type": "整数", "min": 18, "max": 80},
+        {"name": "性别", "type": "枚举", "custom_values": "男, 女"},
+        {"name": "保险类型", "type": "枚举", "custom_values": "人寿保险, 车险, 健康险"},
+        {"name": "保额", "type": "小数", "min": 100000.0, "max": 10000000.0},
+        {"name": "保费", "type": "小数", "min": 1000.0, "max": 50000.0},
+        {"name": "投保日期", "type": "日期"},
+        {"name": "到期日期", "type": "日期"},
+        {"name": "理赔状态", "type": "枚举", "custom_values": "已理赔, 未理赔"},
+    ],
+    "社交媒体": [
+        {"name": "用户ID", "type": "UUID"},
+        {"name": "用户名", "type": "姓名", "unique_count": 5},
+        {"name": "注册日期", "type": "日期"},
+        {"name": "性别", "type": "枚举", "custom_values": "男, 女"},
+        {"name": "年龄", "type": "整数", "min": 13, "max": 80},
+        {"name": "关注人数", "type": "整数", "min": 0, "max": 10000},
+        {"name": "粉丝数量", "type": "整数", "min": 0, "max": 1000000},
+        {"name": "发帖数量", "type": "整数", "min": 0, "max": 10000},
+        {"name": "最近登录时间", "type": "日期"},
+        {"name": "所在城市", "type": "城市", "unique_count": 5},
+    ],
+    "游戏行业": [
+        {"name": "玩家ID", "type": "UUID"},
+        {"name": "玩家昵称", "type": "姓名", "unique_count": 5},
+        {"name": "注册日期", "type": "日期"},
+        {"name": "游戏名称", "type": "枚举", "custom_values": "王者荣耀, 原神, 英雄联盟"},
+        {"name": "角色等级", "type": "整数", "min": 1, "max": 100},
+        {"name": "在线时长", "type": "小数", "min": 0.0, "max": 1000.0},
+        {"name": "充值金额", "type": "小数", "min": 0.0, "max": 10000.0},
+        {"name": "最近登录时间", "type": "日期"},
+        {"name": "所在地区", "type": "城市", "unique_count": 5},
+    ],
+    "金融投资": [
+        {"name": "投资者ID", "type": "UUID"},
+        {"name": "姓名", "type": "姓名", "unique_count": 5},
+        {"name": "投资产品", "type": "枚举", "custom_values": "股票, 基金, 债券"},
+        {"name": "投资金额", "type": "小数", "min": 1000.0, "max": 1000000.0},
+        {"name": "投资日期", "type": "日期"},
+        {"name": "当前价值", "type": "小数", "min": 1000.0, "max": 10000000.0},
+        {"name": "收益率", "type": "小数", "min": -1.0, "max": 1.0},
+        {"name": "风险等级", "type": "枚举", "custom_values": "低风险, 中风险, 高风险"},
+        {"name": "投资状态", "type": "枚举", "custom_values": "持有中, 已赎回"},
+    ],
+    "农业": [
+        {"name": "农场ID", "type": "UUID"},
+        {"name": "农场名称", "type": "公司", "unique_count": 5},
+        {"name": "农产品类型", "type": "枚举", "custom_values": "小麦, 玉米, 水果"},
+        {"name": "种植面积", "type": "小数", "min": 10.0, "max": 1000.0},
+        {"name": "产量", "type": "小数", "min": 100.0, "max": 10000.0},
+        {"name": "销售价格", "type": "小数", "min": 10.0, "max": 500.0},
+        {"name": "收获日期", "type": "日期"},
+        {"name": "农场地址", "type": "城市", "unique_count": 5},
+    ],
+    "娱乐与影视": [
+        {"name": "电影ID", "type": "UUID"},
+        {"name": "电影名称", "type": "枚举", "custom_values": "复仇者联盟, 泰坦尼克号"},
+        {"name": "导演姓名", "type": "姓名", "unique_count": 5},
+        {"name": "上映日期", "type": "日期"},
+        {"name": "类型", "type": "枚举", "custom_values": "动作, 喜剧, 科幻"},
+        {"name": "票房收入", "type": "小数", "min": 100000.0, "max": 100000000.0},
+        {"name": "观影人数", "type": "整数", "min": 1000, "max": 1000000},
+        {"name": "评分", "type": "小数", "min": 0.0, "max": 10.0},
     ],
 }
 
@@ -279,15 +413,16 @@ def display_and_download(df, tab_name):
     st.dataframe(df, use_container_width=True)
 
 # 主逻辑
-for tab, tab_name in zip([tab_default, tab_auto, tab_bank, tab_retail, tab_pharma], 
-        ["默认", "汽车", "银行", "零售", "医药"]):
+for tab, tab_name in zip(tab_objects, tabs):
     with tab:
         st.markdown(f"## {tab_name} 数据生成器")
         col1, col2 = st.columns(2)
         with col1:
             num_rows = st.number_input("选择生成的数据条数 (500~5000)", min_value=500, max_value=5000, value=1000, step=100, key=f"{tab_name}_num_rows")
         with col2:
-            num_columns = st.number_input("选择生成的列数 (1~20)", min_value=1, max_value=20, value=5, step=1, key=f"{tab_name}_num_columns")
+            # 动态设置默认列数
+            default_num_columns = len(default_columns.get(tab_name, []))
+            num_columns = st.number_input("选择生成的列数 (1~20)", min_value=1, max_value=20, value=default_num_columns, step=1, key=f"{tab_name}_num_columns")
         st.markdown("---")
         (
             columns,
