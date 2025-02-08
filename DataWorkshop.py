@@ -43,7 +43,12 @@ for i in range(0, num_columns, cols_per_row):
         with col_config[j]:  # 在当前列中添加控件
             st.markdown(f"**第 {idx+1} 列配置**")
             col_name = st.text_input(f"列名", f"Column {idx+1}", key=f"col_name_{idx}")
-            column_type = st.selectbox(f"数据类型", data_type_options, index=0, key=f"type_{idx}")
+            column_type = st.selectbox(
+                f"数据类型",
+                data_type_options,
+                index=0,
+                key=f"type_{idx}"
+            )
             
             if column_type == "整数":
                 min_val = st.number_input(f"最小值", value=0, key=f"min_{idx}")
@@ -79,6 +84,19 @@ for i in range(0, num_columns, cols_per_row):
                 unique_counts.append(None)  # 独特数据数量为空
             elif column_type in ["姓名", "公司", "城市", "国家"]:
                 # 弹出滑动条，允许用户选择独特数据的数量
+                unique_count = st.slider(
+                    f"{column_type} 的独特数据数量",
+                    min_value=1,
+                    max_value=20,
+                    value=5,
+                    key=f"unique_{idx}"
+                )
+                unique_counts.append(unique_count)  # 存储独特数据数量
+                min_vals.append(None)
+                max_vals.append(None)
+                custom_values.append(None)  # 自定义值为空
+            elif column_type == "列名":
+                # 增加滑动条，允许用户选择独特数据的数量
                 unique_count = st.slider(
                     f"{column_type} 的独特数据数量",
                     min_value=1,
@@ -146,7 +164,7 @@ with button_col1:
             # 预先生成所有独特数据
             unique_data_cache = {}
             for col_name, col_type, unique_count in zip(columns, column_types, unique_counts):
-                if col_type in ["姓名", "公司", "城市", "国家"] and unique_count is not None:
+                if col_type in ["姓名", "公司", "城市", "国家", "列名"] and unique_count is not None:
                     if col_type == "姓名":
                         unique_data_cache[col_name] = [fake.name() for _ in range(unique_count)]
                     elif col_type == "公司":
@@ -155,6 +173,8 @@ with button_col1:
                         unique_data_cache[col_name] = [fake.city() for _ in range(unique_count)]
                     elif col_type == "国家":
                         unique_data_cache[col_name] = [fake.country() for _ in range(unique_count)]
+                    elif col_type == "列名":
+                        unique_data_cache[col_name] = [f"{col_name}{i+1}" for i in range(unique_count)]
             
             # 生成数据
             data = []
@@ -162,8 +182,7 @@ with button_col1:
                 row = {}
                 for col_name, col_type, min_val, max_val, custom_val in zip(columns, column_types, min_vals, max_vals, custom_values):
                     if col_type == "列名":
-                        products = [f"{col_name}{i+1}" for i in range(5)]
-                        row[col_name] = random.choice(products)
+                        row[col_name] = random.choice(unique_data_cache[col_name])
                     elif col_type == "自定义":
                         if custom_val:  # 如果用户输入了自定义值
                             row[col_name] = random.choice(custom_val)
