@@ -85,6 +85,16 @@ def generate_column_config(tab_name, num_columns):
     # 获取当前标签的默认列配置
     default_config = default_columns.get(tab_name, [])
 
+    # 如果用户选择的列数超过默认配置的数量，则补充默认列配置
+    if num_columns > len(default_config):
+        for i in range(len(default_config), num_columns):
+            default_config.append({
+                "name": f"新增列{i+1}",
+                "type": "整数",
+                "min": 0,
+                "max": 100,
+            })
+
     # 动态截取指定数量的列配置
     config_to_display = default_config[:num_columns]
 
