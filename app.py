@@ -309,7 +309,7 @@ def generate_column_config(tab_name, num_columns):
                     unique_count = st.slider(
                         f"{column_type} 的独特数据数量",
                         min_value=1,
-                        max_value=20,
+                        max_value=50,
                         value=config.get("unique_count", 5),
                         key=f"{tab_name}_unique_{idx}"
                     )
@@ -340,7 +340,7 @@ def generate_column_config(tab_name, num_columns):
                     unique_count = st.slider(
                         f"{column_type} 的独特数据数量",
                         min_value=1,
-                        max_value=20,
+                        max_value=50,
                         value=config.get("unique_count", 5),
                         key=f"{tab_name}_unique_{idx}"
                     )
