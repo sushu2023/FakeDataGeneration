@@ -437,7 +437,7 @@ for tab, tab_name in zip(tab_objects, tabs):
         st.markdown(f"## {tab_name} 数据生成器")
         col1, col2 = st.columns(2)
         with col1:
-            num_rows = st.number_input("选择生成的数据条数 (500~5000)", min_value=500, max_value=5000, value=1000, step=100, key=f"{tab_name}_num_rows")
+            num_rows = st.number_input("选择生成的数据条数 (50~5000)", min_value=50, max_value=5000, value=1000, step=100, key=f"{tab_name}_num_rows")
         with col2:
             # 动态设置默认列数
             default_num_columns = len(default_columns.get(tab_name, []))
